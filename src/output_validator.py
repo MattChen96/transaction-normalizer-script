@@ -10,6 +10,7 @@ Controlli per riga:
 """
 from __future__ import annotations
 
+import json
 import re
 from datetime import datetime
 from pathlib import Path
@@ -17,35 +18,16 @@ from typing import Any
 
 import pandas as pd
 
+from src.config_loader import _load_json_strict
 from src.logger import RunLogger
 from src.field_mapper import OUTPUT_FIELDS
 
+_OUTPUT_SCHEMA_PATH = Path(__file__).parent.parent / "config" / "output_schema.json"
+_OUTPUT_SCHEMA = _load_json_strict(_OUTPUT_SCHEMA_PATH)
+
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_CATEGORY_ENUM = {
-    "🏠 Casa",
-    "🍲 Spesa",
-    "🚑 Salute",
-    "🚌 Trasporti",
-    "👕 Vestiario",
-    "🌿 Cura Personale",
-    "🏋️ Sport",
-    "📚 Formazione",
-    "🛠️ Altre Necessità",
-    "💸 Tasse",
-    "🎫 Abbonamenti",
-    "🛍️ Acquisti Online",
-    "🍝 Cibo Fuori",
-    "🍨 Spuntino",
-    "🎁 Regali",
-    "✈️ Vacanze",
-    "💆 Benessere",
-    "🎳 Uscite Fuori",
-    "🎮 Hobby",
-    "🌟 Trasporti Extra",
-    "📲 Tecnologia",
-    "🎲 Altro",
-}
-_WALLET_ENUM = {"Hype", "Revolut", "Contanti", "Satispay", "Sella", "Trade Republic"}
+_CATEGORY_ENUM = set(_OUTPUT_SCHEMA["column_definitions"]["Categoria"]["enum"])
+_WALLET_ENUM = set(_OUTPUT_SCHEMA["column_definitions"]["Wallet"]["enum"])
 
 
 def validate_output(
