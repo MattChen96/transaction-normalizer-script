@@ -1,0 +1,116 @@
+{
+  "source": {
+    "name": "Banca Sella",
+    "version": "1.0",
+    "description": "Export CSV Banca Sella — lista movimenti dal conto corrente"
+  },
+
+  "file": {
+    "format": "csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "skip_rows": 0,
+    "header_row": 0,
+    "decimal_separator": ",",
+    "thousands_separator": ".",
+    "quotechar": "\""
+  },
+
+  "filters": {
+    "include": [],
+    "exclude": [
+      {
+        "column": "Categoria",
+        "operator": "equals",
+        "value": "Giroconti",
+        "case_sensitive": false
+      },
+      {
+        "column": "Descrizione",
+        "operator": "starts_with",
+        "value": "Saldo al",
+        "case_sensitive": false
+      }
+    ]
+  },
+
+  "fields": {
+    "Data": {
+      "input_column": "Data valuta",
+      "transform": [
+        { "type": "trim" },
+        {
+          "type": "date_format",
+          "input_format": "%d/%m/%Y",
+          "output_format": "%Y-%m-%d"
+        }
+      ]
+    },
+
+    "Acquisto": {
+      "input_column": "Descrizione",
+      "transform": [
+        { "type": "trim" },
+        { "type": "regex_replace", "pattern": "\\s{2,}", "replacement": " " },
+        { "type": "titlecase" }
+      ]
+    },
+
+    "Importo": {
+      "input_column": "Importo",
+      "transform": [
+        { "type": "trim" },
+        {
+          "type": "number_normalize",
+          "decimal_separator": ",",
+          "thousands_separator": "."
+        },
+        { "type": "number_round", "decimals": 2 }
+      ]
+    },
+
+    "Categoria": {
+      "input_column": "Categoria",
+      "transform": [
+        { "type": "trim" },
+        { "type": "lowercase" }
+      ],
+      "category_mapping": {
+        "map": {
+          "entrate varie": "💰 Entrate",
+          "giroconti": "🎲 Altro",
+          "prelievi": "🏧 Prelievi",
+          "bonifici": "🎲 Altro",
+          "pagamenti": "🛒 Shopping",
+          "tasse e imposte": "📋 Tasse"
+        },
+        "case_sensitive": false,
+        "default": "🎲 Altro"
+      },
+      "embedding_fallback": {
+        "source_column": "Descrizione",
+        "threshold": 0.20
+      }
+    },
+
+    "Tag": {
+      "input_column": "Etichette",
+      "transform": [
+        { "type": "trim" }
+      ],
+      "default": ""
+    },
+
+    "Wallet": {
+      "constant": "Sella"
+    },
+
+    "Note": {
+      "input_column": "Sottocategoria",
+      "transform": [
+        { "type": "trim" }
+      ],
+      "default": ""
+    }
+  }
+}

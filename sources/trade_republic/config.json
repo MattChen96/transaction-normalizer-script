@@ -1,0 +1,260 @@
+{
+  "source": {
+    "name": "Trade Republic",
+    "version": "2.0",
+    "description": "Estratti conto Trade Republic in formato CSV app — include transazioni cash e trading"
+  },
+
+  "file": {
+    "format": "csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "skip_rows": 0,
+    "header_row": 0,
+    "decimal_separator": ".",
+    "thousands_separator": "",
+    "quotechar": "\""
+  },
+
+  "filters": {
+    "include": [
+      {
+        "column": "account_type",
+        "operator": "equals",
+        "value": "DEFAULT",
+        "case_sensitive": false
+      }
+    ],
+    "exclude": [
+      {
+        "column": "type",
+        "operator": "in",
+        "value": ["BUY", "SELL", "DEPOSIT", "WITHDRAWAL"],
+        "case_sensitive": false
+      },
+      {
+        "column": "category",
+        "operator": "equals",
+        "value": "TRADING",
+        "case_sensitive": false
+      },
+      {
+        "column": "type",
+        "operator": "equals",
+        "value": "CARD_ORDERING_FEE",
+        "case_sensitive": false
+      }
+    ]
+  },
+
+  "fields": {
+    "Data": {
+      "input_column": "date",
+      "transform": [
+        {
+          "type": "trim"
+        }
+      ]
+    },
+
+    "Acquisto": {
+      "input_column": "description",
+      "transform": [
+        {
+          "type": "trim"
+        },
+        {
+          "type": "regex_replace",
+          "pattern": "^SumUp\\s+\\*",
+          "replacement": ""
+        }
+      ]
+    },
+
+    "Importo": {
+      "input_column": "amount",
+      "transform": [
+        {
+          "type": "trim"
+        },
+        {
+          "type": "number_normalize",
+          "decimal_separator": ".",
+          "thousands_separator": ""
+        },
+        {
+          "type": "number_round",
+          "decimals": 2
+        }
+      ]
+    },
+
+    "Categoria": {
+      "input_column": "mcc_code",
+      "transform": [
+        {
+          "type": "trim"
+        }
+      ],
+      "category_mapping": {
+        "map": {
+          "4111": "🚌 Trasporti",
+          "4112": "🚌 Trasporti",
+          "4121": "🚌 Trasporti",
+          "4131": "🚌 Trasporti",
+          "4211": "🚌 Trasporti",
+          "4411": "✈️ Vacanze",
+          "4415": "✈️ Vacanze",
+          "4511": "🚌 Trasporti",
+          "4582": "🚌 Trasporti",
+          "4722": "✈️ Vacanze",
+          "4784": "🚌 Trasporti",
+          "4900": "🎫 Abbonamenti",
+          "4907": "🎫 Abbonamenti",
+          "5045": "🛠️ Altre Necessità",
+          "5046": "🛠️ Altre Necessità",
+          "5047": "🛠️ Altre Necessità",
+          "5200": "🏠 Casa",
+          "5251": "🏠 Casa",
+          "5261": "🏠 Casa",
+          "5262": "🏠 Casa",
+          "5300": "🏠 Casa",
+          "5310": "🏠 Casa",
+          "5311": "👕 Vestiario",
+          "5320": "🏠 Casa",
+          "5331": "👕 Vestiario",
+          "5411": "🍲 Spesa",
+          "5412": "🍲 Spesa",
+          "5462": "🍲 Spesa",
+          "5499": "🎲 Altro",
+          "5511": "🚗 Trasporti",
+          "5532": "🏠 Casa",
+          "5533": "🏠 Casa",
+          "5534": "🏠 Casa",
+          "5541": "🚌 Trasporti",
+          "5551": "🚑 Salute",
+          "5592": "📚 Formazione",
+          "5632": "👕 Vestiario",
+          "5641": "👕 Vestiario",
+          "5651": "👕 Vestiario",
+          "5661": "🏋️ Sport",
+          "5712": "👕 Vestiario",
+          "5713": "👕 Vestiario",
+          "5714": "👕 Vestiario",
+          "5722": "👕 Vestiario",
+          "5731": "🎮 Hobby",
+          "5735": "📲 Tecnologia",
+          "5811": "🍝 Cibo Fuori",
+          "5812": "🍝 Cibo Fuori",
+          "5813": "🍝 Cibo Fuori",
+          "5814": "🍝 Cibo Fuori",
+          "5921": "🎲 Altro",
+          "5945": "🎮 Hobby",
+          "5948": "👕 Vestiario",
+          "5950": "👕 Vestiario",
+          "5960": "🛍️ Acquisti Online",
+          "5961": "📲 Tecnologia",
+          "5962": "👕 Vestiario",
+          "5967": "👕 Vestiario",
+          "5968": "📲 Tecnologia",
+          "5969": "📲 Tecnologia",
+          "5977": "🎮 Hobby",
+          "5999": "🛍️ Acquisti Online",
+          "6010": "🏠 Casa",
+          "6051": "🏠 Casa",
+          "6211": "🚑 Salute",
+          "6300": "💸 Tasse",
+          "6512": "🏠 Casa",
+          "7011": "✈️ Vacanze",
+          "7012": "🏠 Casa",
+          "7015": "🏠 Casa",
+          "7032": "🏠 Casa",
+          "7033": "🏠 Casa",
+          "7210": "🌿 Cura Personale",
+          "7211": "🌿 Cura Personale",
+          "7212": "🌿 Cura Personale",
+          "7220": "🌿 Cura Personale",
+          "7221": "🌿 Cura Personale",
+          "7230": "🌿 Cura Personale",
+          "7231": "🌿 Cura Personale",
+          "7278": "🎮 Hobby",
+          "7299": "🌿 Cura Personale",
+          "7379": "🎮 Hobby",
+          "7393": "🛠️ Altre Necessità",
+          "7394": "🛠️ Altre Necessità",
+          "7399": "🛠️ Altre Necessità",
+          "7510": "🚗 Trasporti",
+          "7511": "🚗 Trasporti",
+          "7512": "🚗 Trasporti",
+          "7513": "🚗 Trasporti",
+          "7519": "🚗 Trasporti",
+          "7699": "🎮 Hobby",
+          "7999": "💆 Benessere",
+          "8011": "🚑 Salute",
+          "8021": "🚑 Salute",
+          "8031": "🚑 Salute",
+          "8042": "🚑 Salute",
+          "8050": "🚑 Salute",
+          "8071": "🚑 Salute",
+          "8099": "🚑 Salute",
+          "9211": "💸 Tasse",
+          "9223": "💸 Tasse",
+          "9402": "🎳 Uscite Fuori",
+          "9405": "🎳 Uscite Fuori"
+        },
+        "case_sensitive": false,
+        "default": "🎲 Altro"
+      },
+      "embedding_fallback": {
+        "source_column": "description",
+        "threshold": 0.20
+      },
+      "default": "🎲 Altro"
+    },
+
+    "Tag": {
+      "constant": ""
+    },
+
+    "Wallet": {
+      "constant": "Trade Republic"
+    },
+
+    "Note": {
+      "input_column": "type",
+      "transform": [
+        {
+          "type": "conditional",
+          "conditions": [
+            {
+              "if_column": "type",
+              "operator": "equals",
+              "value": "INTEREST_PAYMENT",
+              "then": "Interessi"
+            },
+            {
+              "if_column": "type",
+              "operator": "equals",
+              "value": "BENEFITS_SAVEBACK",
+              "then": "Cashback/Reward"
+            },
+            {
+              "if_column": "type",
+              "operator": "equals",
+              "value": "TRANSFER_INBOUND",
+              "then": "Trasferimento in entrata"
+            },
+            {
+              "if_column": "type",
+              "operator": "equals",
+              "value": "TRANSFER_DIRECT_DEBIT_INBOUND",
+              "then": "Addebito diretto"
+            }
+          ],
+          "else": ""
+        }
+      ],
+      "default": ""
+    }
+  }
+}

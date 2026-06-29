@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Transaction Normalizer — Source Config Schema",
+  "description": "JSON Schema per la validazione strutturale di sources/<name>/config.json",
+  "type": "object",
+  "required": ["source", "file", "fields"],
+  "additionalProperties": false,
+
+  "definitions": {
+
+    "filter_rule": {
+      "type": "object",
+      "required": ["column", "operator"],
+      "additionalProperties": false,
+      "properties": {
+        "column": { "type": "string", "minLength": 1 },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "equals", "not_equals",
+            "in", "not_in",
+            "contains", "not_contains",
+            "starts_with", "ends_with",
+            "regex",
+            "gt", "gte", "lt", "lte",
+            "is_empty", "is_not_empty"
+          ]
+        },
+        "value": {},
+        "case_sensitive": { "type": "boolean" }
+      }
+    },
+
+    "transform_object": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "trim", "lowercase", "uppercase", "titlecase",
+            "date_format",
+            "number_normalize", "number_abs", "number_negate", "number_round",
+            "regex_extract", "regex_replace", "replace", "replace_map",
+            "concat", "strip_chars", "split_take",
+            "coalesce", "conditional", "sign_from_column",
+            "embedding_categorize"
+          ]
+        },
+        "input_format":        { "type": "string" },
+        "output_format":       { "type": "string" },
+        "decimal_separator":   { "type": "string" },
+        "thousands_separator": { "type": "string" },
+        "decimals":            { "type": "integer", "minimum": 0 },
+        "pattern":             { "type": "string" },
+        "group":               { "type": "integer", "minimum": 0 },
+        "replacement":         { "type": "string" },
+        "find":                { "type": "string" },
+        "map":                 { "type": "object" },
+        "values":              { "type": "array" },
+        "separator":           { "type": "string" },
+        "chars":               { "type": "string" },
+        "index":               { "type": "integer" },
+        "columns":             { "type": "array", "items": { "type": "string" } },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["if_column", "operator", "then"],
+            "properties": {
+              "if_column": { "type": "string" },
+              "operator":  { "type": "string" },
+              "value":     {},
+              "then":      {}
+            }
+          }
+        },
+        "else": {},
+        "column":          { "type": "string" },
+        "positive_values": { "type": "array", "items": { "type": "string" } },
+        "negative_values": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "category_mapping": {
+      "type": "object",
+      "required": ["map", "default"],
+      "additionalProperties": false,
+      "properties": {
+        "map": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "case_sensitive":    { "type": "boolean" },
+        "default":           { "type": "string" },
+        "trim_before_match": { "type": "boolean" }
+      }
+    },
+
+    "field_definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "constant":          {},
+        "input_column":      { "type": "string", "minLength": 1 },
+        "input_columns":     { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+        "concat_separator":  { "type": "string" },
+        "transform": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/transform_object" }
+        },
+        "category_mapping":  { "$ref": "#/definitions/category_mapping" },
+        "embedding_fallback": {
+          "type": "object",
+          "required": ["source_column"],
+          "additionalProperties": false,
+          "properties": {
+            "source_column": { "type": "string", "minLength": 1 },
+            "threshold":     { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "default":           {}
+      }
+    }
+
+  },
+
+  "properties": {
+
+    "source": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name":        { "type": "string", "minLength": 1 },
+        "version":     { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+
+    "file": {
+      "type": "object",
+      "required": ["format"],
+      "additionalProperties": false,
+      "properties": {
+        "format":               { "type": "string", "enum": ["csv", "xlsx", "xls"] },
+        "encoding":             { "type": "string" },
+        "delimiter":            { "type": "string" },
+        "skip_rows":            { "type": "integer", "minimum": 0 },
+        "header_row":           { "type": "integer", "minimum": 0 },
+        "sheet_name":           {},
+        "decimal_separator":    { "type": "string" },
+        "thousands_separator":  { "type": "string" },
+        "date_format":          { "type": "string" },
+        "quotechar":            { "type": "string" }
+      }
+    },
+
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "include": { "type": "array", "items": { "$ref": "#/definitions/filter_rule" } },
+        "exclude": { "type": "array", "items": { "$ref": "#/definitions/filter_rule" } }
+      }
+    },
+
+    "fields": {
+      "type": "object",
+      "required": ["Data", "Acquisto", "Importo", "Categoria", "Tag", "Wallet", "Note"],
+      "additionalProperties": false,
+      "properties": {
+        "Data":      { "$ref": "#/definitions/field_definition" },
+        "Acquisto":  { "$ref": "#/definitions/field_definition" },
+        "Importo":   { "$ref": "#/definitions/field_definition" },
+        "Categoria": { "$ref": "#/definitions/field_definition" },
+        "Tag":       { "$ref": "#/definitions/field_definition" },
+        "Wallet":    { "$ref": "#/definitions/field_definition" },
+        "Note":      { "$ref": "#/definitions/field_definition" }
+      }
+    }
+
+  }
+}

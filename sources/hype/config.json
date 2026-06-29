@@ -1,0 +1,111 @@
+{
+  "source": {
+    "name": "Hype",
+    "version": "2.0",
+    "description": "Export CSV Hype — lista movimenti dal conto corrente"
+  },
+
+  "file": {
+    "format": "csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "skip_rows": 0,
+    "header_row": 0,
+    "decimal_separator": ".",
+    "thousands_separator": "",
+    "quotechar": "\""
+  },
+
+  "filters": {
+    "include": [],
+    "exclude": [
+      {
+        "column": "Tipologia",
+        "operator": "equals",
+        "value": "Giroconto",
+        "case_sensitive": false
+      },
+      {
+        "column": "Importo ( € )",
+        "operator": "equals",
+        "value": "0"
+      }
+    ]
+  },
+
+  "fields": {
+    "Data": {
+      "input_column": "Data contabile",
+      "transform": [
+        { "type": "trim" },
+        {
+          "type": "date_format",
+          "input_format": "%d/%m/%Y",
+          "output_format": "%Y-%m-%d"
+        }
+      ]
+    },
+
+    "Acquisto": {
+      "input_columns": ["Nome", "Descrizione"],
+      "concat_separator": " — ",
+      "transform": [
+        { "type": "trim" },
+        { "type": "regex_replace", "pattern": "\\s{2,}", "replacement": " " },
+        { "type": "titlecase" }
+      ]
+    },
+
+    "Importo": {
+      "input_column": "Importo ( € )",
+      "transform": [
+        { "type": "trim" },
+        {
+          "type": "number_normalize",
+          "decimal_separator": ".",
+          "thousands_separator": ""
+        },
+        { "type": "number_round", "decimals": 2 }
+      ]
+    },
+
+    "Categoria": {
+      "input_column": "Tipologia",
+      "transform": [
+        { "type": "trim" },
+        { "type": "lowercase" }
+      ],
+      "category_mapping": {
+        "map": {
+          "pagamento con carta":  "🎲 Altro",
+          "bonifico istantaneo": "🎲 Altro",
+          "bonifico ordinario":  "🎲 Altro",
+          "addebito diretto":    "🎫 Abbonamenti"
+        },
+        "case_sensitive": false,
+        "default": "🎲 Altro"
+      },
+      "embedding_fallback": {
+        "source_column": "Descrizione",
+        "threshold": 0.20
+      },
+      "default": "🎲 Altro"
+    },
+
+    "Tag": {
+      "constant": ""
+    },
+
+    "Wallet": {
+      "constant": "Hype"
+    },
+
+    "Note": {
+      "input_column": "Tipologia",
+      "transform": [
+        { "type": "trim" }
+      ],
+      "default": ""
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Transaction Normalizer — Output Schema",
+  "version": "2.0.0",
+  "columns": [
+    "Data",
+    "Acquisto",
+    "Importo",
+    "Categoria",
+    "Tag",
+    "Wallet",
+    "Note"
+  ],
+  "column_definitions": {
+    "Data": {
+      "type": "string",
+      "format": "date",
+      "description": "Data della transazione in formato ISO 8601 (YYYY-MM-DD)"
+    },
+    "Acquisto": {
+      "type": "string",
+      "description": "Descrizione testuale dell'acquisto"
+    },
+    "Importo": {
+      "type": "number",
+      "description": "Importo della transazione. Negativo = uscita, positivo = entrata. Punto come separatore decimale."
+    },
+    "Categoria": {
+      "type": "string",
+      "enum": [
+        "🏠 Casa",
+        "🍲 Spesa",
+        "🚑 Salute",
+        "🚌 Trasporti",
+        "👕 Vestiario",
+        "🌿 Cura Personale",
+        "🏋️ Sport",
+        "📚 Formazione",
+        "🛠️ Altre Necessità",
+        "💸 Tasse",
+        "🎫 Abbonamenti",
+        "🛍️ Acquisti Online",
+        "🍝 Cibo Fuori",
+        "🍨 Spuntino",
+        "🎁 Regali",
+        "✈️ Vacanze",
+        "💆 Benessere",
+        "🎳 Uscite Fuori",
+        "🎮 Hobby",
+        "🌟 Trasporti Extra",
+        "📲 Tecnologia",
+        "🎲 Altro"
+      ],
+      "description": "Categoria con emoji della transazione"
+    },
+    "Tag": {
+      "type": "string",
+      "description": "Tag libero per ulteriore categorizzazione"
+    },
+    "Wallet": {
+      "type": "string",
+      "enum": ["Hype", "Revolut", "Contanti", "Satispay", "Sella", "Trade Republic"],
+      "description": "Wallet o portafoglio da cui proviene la transazione"
+    },
+    "Note": {
+      "type": "string",
+      "description": "Note aggiuntive libere sulla transazione"
+    }
+  }
+}
